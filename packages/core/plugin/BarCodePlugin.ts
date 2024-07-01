@@ -2,7 +2,7 @@
  * @Author: 秦少卫
  * @Date: 2024-06-06 14:12:24
  * @LastEditors: 秦少卫
- * @LastEditTime: 2024-06-07 11:57:45
+ * @LastEditTime: 2024-06-07 21:24:56
  * @Description: 条形码生成工具
  */
 
@@ -24,16 +24,17 @@ enum CodeType {
   pharmacode = 'pharmacode',
 }
 
-class BarCodePlugin {
-  public canvas: fabric.Canvas;
-  public editor: IEditor;
+class BarCodePlugin implements IPluginTempl {
   static pluginName = 'BarCodePlugin';
   static apis = ['addBarcode', 'setBarcode', 'getBarcodeTypes'];
-  constructor(canvas: fabric.Canvas, editor: IEditor) {
-    this.canvas = canvas;
-    this.editor = editor;
-  }
+  constructor(public canvas: fabric.Canvas, public editor: IEditor) {}
 
+  async hookTransform(object: any) {
+    if (object.extensionType === 'barcode') {
+      const url = await this._getBase64Str(object.extension);
+      object.src = url;
+    }
+  }
   _getBase64Str(option: any) {
     const canvas = document.createElement('canvas');
     JsBarcode(canvas, option.value, {
@@ -51,6 +52,9 @@ class BarCodePlugin {
       textAlign: 'left',
       textPosition: 'bottom',
       fontSize: 12,
+      background: '#fff',
+      lineColor: '#000',
+      displayValue: false,
     };
   }
 
@@ -64,10 +68,9 @@ class BarCodePlugin {
           extensionType: 'barcode',
           extension: option,
         });
+        imgEl.scaleToWidth(this.editor.getWorkspase().getScaledWidth() / 2);
         this.canvas.add(imgEl);
-
         this.canvas.setActiveObject(imgEl);
-
         this.editor.position('center');
       },
       { crossOrigin: 'anonymous' }

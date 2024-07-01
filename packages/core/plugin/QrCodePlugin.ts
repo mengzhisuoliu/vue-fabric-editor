@@ -2,13 +2,14 @@
  * @Author: 秦少卫
  * @Date: 2024-06-06 19:58:26
  * @LastEditors: 秦少卫
- * @LastEditTime: 2024-06-07 11:03:27
+ * @LastEditTime: 2024-06-15 09:34:36
  * @Description: 二维码生成工具
  */
 
 import { fabric } from 'fabric';
 import Editor from '../Editor';
 import QRCodeStyling from 'qr-code-styling';
+import { blobToBase64 } from '../utils/utils';
 
 type IEditor = Editor;
 
@@ -41,20 +42,24 @@ enum errorCorrectionLevelType {
   H = 'H',
 }
 
-class QrCodePlugin {
-  public canvas: fabric.Canvas;
-  public editor: IEditor;
+class QrCodePlugin implements IPluginTempl {
   static pluginName = 'QrCodePlugin';
   static apis = ['addQrCode', 'setQrCode', 'getQrCodeTypes'];
-  constructor(canvas: fabric.Canvas, editor: IEditor) {
-    this.canvas = canvas;
-    this.editor = editor;
+  constructor(public canvas: fabric.Canvas, public editor: IEditor) {}
+
+  async hookTransform(object: any) {
+    if (object.extensionType === 'qrcode') {
+      const paramsOption = this._paramsToOption(object.extension);
+      const url = await this._getBase64Str(paramsOption);
+      object.src = url;
+    }
   }
 
   async _getBase64Str(options: any) {
     const qrCode = new QRCodeStyling(options);
     const blob = await qrCode.getRawData('png');
-    const base64Str = await this._blobToBase64(blob);
+    if (!blob) return '';
+    const base64Str = await blobToBase64(blob);
     return base64Str || '';
   }
 
@@ -67,7 +72,7 @@ class QrCodePlugin {
       dotsColor: 'black',
       dotsType: 'rounded',
       cornersSquareColor: 'black',
-      cornersSquareType: 'dot',
+      cornersSquareType: 'square',
       cornersDotColor: 'black',
       cornersDotType: 'square',
       background: '#ffffff',
@@ -106,17 +111,6 @@ class QrCodePlugin {
     };
   }
 
-  _blobToBase64(blob: Blob) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      //读取后，result属性中将包含一个data:URL格式的Base64字符串用来表示所读取的文件
-      reader.onload = function (e) {
-        resolve(e.target.result);
-      };
-    });
-  }
-
   async addQrCode() {
     const option = this._defaultBarcodeOption();
     const paramsOption = this._paramsToOption(option);
@@ -128,6 +122,7 @@ class QrCodePlugin {
           extensionType: 'qrcode',
           extension: option,
         });
+        imgEl.scaleToWidth(this.editor.getWorkspase().getScaledWidth() / 2);
         this.canvas.add(imgEl);
         this.canvas.setActiveObject(imgEl);
         this.editor.position('center');

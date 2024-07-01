@@ -2,7 +2,7 @@
  * @Author: 秦少卫
  * @Date: 2023-06-27 12:26:41
  * @LastEditors: 秦少卫
- * @LastEditTime: 2024-05-11 14:18:13
+ * @LastEditTime: 2024-06-30 20:00:37
  * @Description: 画布区域插件
  */
 
@@ -11,19 +11,24 @@ import Editor from '../Editor';
 import { throttle } from 'lodash-es';
 type IEditor = Editor;
 
-class WorkspacePlugin {
-  public canvas: fabric.Canvas;
-  public editor: IEditor;
+class WorkspacePlugin implements IPluginTempl {
   static pluginName = 'WorkspacePlugin';
   static events = ['sizeChange'];
-  static apis = ['big', 'small', 'auto', 'one', 'setSize', 'getWorkspase', 'setWorkspaseBg'];
+  static apis = [
+    'big',
+    'small',
+    'auto',
+    'one',
+    'setSize',
+    'getWorkspase',
+    'setWorkspaseBg',
+    'setCenterFromObject',
+  ];
   workspaceEl!: HTMLElement;
   workspace: null | fabric.Rect;
   option: any;
   zoomRatio: number;
-  constructor(canvas: fabric.Canvas, editor: IEditor) {
-    this.canvas = canvas;
-    this.editor = editor;
+  constructor(public canvas: fabric.Canvas, public editor: IEditor) {
     this.workspace = null;
     this.init({
       width: 900,
@@ -52,6 +57,7 @@ class WorkspacePlugin {
       if (workspace) {
         workspace.set('selectable', false);
         workspace.set('hasControls', false);
+        workspace.set('evented', false);
         this.setSize(workspace.width, workspace.height);
         this.editor.emit('sizeChange', workspace.width, workspace.height);
       }

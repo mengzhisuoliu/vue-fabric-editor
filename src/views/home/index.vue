@@ -1,8 +1,8 @@
 <!--
  * @Author: 秦少卫
  * @Date: 2024-05-17 15:30:21
- * @LastEditors: 秦少卫
- * @LastEditTime: 2024-06-06 20:05:13
+ * @LastEditors: June 1601745371@qq.com
+ * @LastEditTime: 2024-06-19 11:05:24
  * @Description: file content
 -->
 <template>
@@ -10,32 +10,41 @@
     <Layout>
       <!-- 头部区域 -->
       <Header v-if="state.show">
-        <!-- logo -->
-        <span class="logo">
+        <div class="left">
+          <logo></logo>
+          <Divider type="vertical" />
+
+          <!-- 导入 -->
+          <import-Json></import-Json>
+          <Divider type="vertical" />
+          <import-file></import-file>
+          <Divider type="vertical" />
+          <Button type="text" to="/template" target="_blank">全部模板</Button>
+          <Divider type="vertical" />
+
+          <myTemplName></myTemplName>
+          <!-- 标尺开关 -->
+          <Tooltip :content="$t('grid')">
+            <iSwitch
+              v-model="state.ruler"
+              @on-change="rulerSwitch"
+              size="small"
+              class="switch"
+            ></iSwitch>
+          </Tooltip>
+          <Divider type="vertical" />
+          <history></history>
+        </div>
+
+        <div class="right">
           <a href="https://github.com/nihaojob/vue-fabric-editor" target="_blank">
-            <Icon type="logo-github" :size="30" />
+            <img
+              src="https://camo.githubusercontent.com/f440bed74efe64ce92599748090837ec92cc33ead4bf29d115d9745af1415c19/68747470733a2f2f62616467656e2e6e65742f6769746875622f73746172732f6e6968616f6a6f622f7675652d6661627269632d656469746f72"
+              alt="vue-fbric-editor"
+            />
           </a>
-        </span>
-
-        <!-- 导入 -->
-        <import-Json></import-Json>
-        <Divider type="vertical" />
-        <import-file></import-file>
-        <Divider type="vertical" />
-        <myTemplName></myTemplName>
-        <!-- 标尺开关 -->
-        <Tooltip :content="$t('grid')">
-          <iSwitch
-            v-model="state.ruler"
-            @on-change="rulerSwitch"
-            size="small"
-            class="switch"
-          ></iSwitch>
-        </Tooltip>
-        <Divider type="vertical" />
-        <history></history>
-
-        <div style="float: right">
+          <!-- 管理员模式 -->
+          <admin />
           <!-- 预览 -->
           <previewCurrent />
           <waterMark />
@@ -135,6 +144,8 @@
               <attributeColor></attributeColor>
               <!-- 字体属性 -->
               <attributeFont></attributeFont>
+              <!-- 字体小数点 -->
+              <attributeTextFloat></attributeTextFloat>
               <!-- 文字内容  -->
               <attribute-text-content></attribute-text-content>
               <!-- 位置信息 -->
@@ -147,10 +158,10 @@
               <attributeRounded></attributeRounded>
               <!-- 关联数据 -->
               <attributeId></attributeId>
-            </div>
 
-            <!-- 新增字体样式使用 -->
-            <!-- <Button @click="canvasEditor.getFontJson()" size="small">获取字体数据</Button> -->
+              <!-- 新增字体样式使用 -->
+              <Button @click="canvasEditor.getFontJson()" size="small">获取元素数据</Button>
+            </div>
           </div>
           <!-- <attribute v-if="state.show"></attribute> -->
         </div>
@@ -174,6 +185,7 @@ import { useRoute } from 'vue-router';
 // import fontTmpl from '@/components/fontTmpl.vue';
 
 // 顶部组件
+import logo from '@/components/logo.vue';
 import align from '@/components/align.vue';
 import myTemplName from '@/components/myTemplName.vue';
 import centerAlign from '@/components/centerAlign.vue';
@@ -190,12 +202,13 @@ import lock from '@/components/lock.vue';
 import dele from '@/components/del.vue';
 import waterMark from '@/components/waterMark.vue';
 import login from '@/components/login';
+import admin from '@/components/admin';
 // 左侧组件
 import importTmpl from '@/components/importTmpl.vue';
 import fontStyle from '@/components/fontStyle.vue';
 import myMaterial from '@/components/myMaterial/index.vue';
 import tools from '@/components/tools.vue';
-import importSvgEl from '@/components/importSvgEl.vue';
+import material from '@/components/material.vue';
 import bgBar from '@/components/bgBar.vue';
 import setSize from '@/components/setSize.vue';
 import replaceImg from '@/components/replaceImg.vue';
@@ -212,6 +225,7 @@ import attributeShadow from '@/components/attributeShadow.vue';
 import attributeBorder from '@/components/attributeBorder.vue';
 import attributeRounded from '@/components/attributeRounded.vue';
 import attributeFont from '@/components/attributeFont.vue';
+import attributeTextFloat from '@/components/attributeTextFloat.vue';
 import attributeColor from '@/components/attributeColor.vue';
 import attributeBarcode from '@/components/attributeBarcode.vue';
 import attributeQrCode from '@/components/attributeQrCode.vue';
@@ -256,6 +270,8 @@ import Editor, {
   SimpleClipImagePlugin,
   BarCodePlugin,
   QrCodePlugin,
+  ImageStroke,
+  ResizePlugin,
 } from '@kuaitu/core';
 import Edit from '@/components/edit.vue';
 import ClipImage from '@/components/clipImage.vue';
@@ -278,46 +294,49 @@ const menuActive = ref('importTmpl');
 const leftBarComponent = {
   importTmpl,
   tools,
-  importSvgEl,
+  material,
   fontStyle,
   layer,
   myMaterial,
 };
-const leftBar = ref([
+
+// fix: 修复vue-i18n function "t" not reactive inside ref object
+// https://github.com/intlify/vue-i18n/issues/1396#issuecomment-1716123143
+const leftBar = reactive([
   {
     //模板
     key: 'importTmpl',
-    name: t('templates'),
+    name: computed(() => t('templates')),
     icon: 'md-book',
   },
   {
     //基础元素
     key: 'tools',
-    name: t('elements'),
+    name: computed(() => t('elements')),
     icon: 'md-images',
   },
   {
     //字体样式
     key: 'fontStyle',
-    name: t('font_style'),
+    name: computed(() => t('font_style')),
     icon: 'ios-pulse',
   },
   {
     // 图片元素
-    key: 'importSvgEl',
-    name: t('material.cartoon'),
+    key: 'material',
+    name: computed(() => t('material.cartoon')),
     icon: 'ios-leaf-outline',
   },
   {
     // 图层
     key: 'layer',
-    name: t('layers'),
+    name: computed(() => t('layers')),
     icon: 'md-reorder',
   },
   {
     // 用户素材
     key: 'myMaterial',
-    name: t('mymaterial'),
+    name: computed(() => t('mine')),
     icon: 'ios-contact-outline',
   },
 ]);
@@ -328,7 +347,7 @@ onMounted(() => {
     fireRightClick: true, // 启用右键，button的数字为3
     stopContextMenu: true, // 禁止默认右键菜单
     controlsAboveOverlay: true, // 超出clipPath后仍然展示控制条
-    imageSmoothingEnabled: false, // 解决文字导出后不清晰问题
+    // imageSmoothingEnabled: false, // 解决文字导出后不清晰问题
     preserveObjectStacking: true, // 当选择画布中的对象时，让对象不在顶层。
   });
 
@@ -366,6 +385,8 @@ onMounted(() => {
   });
   canvasEditor.use(WaterMarkPlugin);
   canvasEditor.use(PsdPlugin);
+  canvasEditor.use(ImageStroke);
+  canvasEditor.use(ResizePlugin);
 
   state.show = true;
   // 默认打开标尺
@@ -387,6 +408,8 @@ const rulerSwitch = (val) => {
   } else {
     canvasEditor.rulerDisable();
   }
+  // 使标尺开关组件失焦，避免响应键盘的空格事件
+  document.activeElement.blur();
 };
 
 // 隐藏工具条
@@ -410,17 +433,6 @@ provide('canvasEditor', canvasEditor);
 provide('mixinState', mixinState);
 </script>
 <style lang="less" scoped>
-.logo {
-  width: 30px;
-  height: 30px;
-  display: inline-block;
-  margin-right: 10px;
-  text-align: center;
-  vertical-align: middle;
-  .ivu-icon {
-    vertical-align: super;
-  }
-}
 // 左侧容器
 .left-bar {
   width: 65px;
@@ -435,12 +447,11 @@ provide('mixinState', mixinState);
 }
 // 右侧容器
 .right-bar {
-  width: 304px; height: 100%; padding: 10px; overflow-y: auto; background: #fff
-  // width: 240px;
-  // height: 100%;
-  // padding: 10px;
-  // overflow-y: auto;
-  // background: #fff;
+  width: 304px;
+  height: 100%;
+  padding: 10px;
+  overflow-y: auto;
+  background: #fff;
 }
 
 // 关闭按钮
@@ -509,13 +520,24 @@ provide('mixinState', mixinState);
 
 :deep(.ivu-layout-header) {
   --height: 45px;
-  padding: 0 10px;
+  padding: 0 0px;
   border-bottom: 1px solid #eef2f8;
   background: #fff;
   height: var(--height);
   line-height: var(--height);
+  display: flex;
+  justify-content: space-between;
 }
 
+.left,
+.right {
+  display: flex;
+  align-items: center;
+  img {
+    display: block;
+    margin-right: 10px;
+  }
+}
 .home,
 .ivu-layout {
   height: 100vh;
@@ -546,7 +568,9 @@ provide('mixinState', mixinState);
 
 #workspace {
   flex: 1;
-  width: 100%; position: relative; background: #f1f1f1;
+  width: 100%;
+  position: relative;
+  background: #f1f1f1;
   overflow: hidden;
 }
 

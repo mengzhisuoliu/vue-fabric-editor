@@ -4,6 +4,8 @@ import ContextMenu from './ContextMenu.js';
 import ServersPlugin from './ServersPlugin';
 import { AsyncSeriesHook } from 'tapable';
 
+import Utils from './utils/utils';
+
 class Editor extends EventEmitter {
   private canvas: fabric.Canvas | null = null;
   contextMenu: ContextMenu | null = null;
@@ -21,6 +23,7 @@ class Editor extends EventEmitter {
     'hookImportAfter',
     'hookSaveBefore',
     'hookSaveAfter',
+    'hookTransform',
   ];
   public hooksEntity: {
     [propName: string]: AsyncSeriesHook<any, any>;
@@ -32,6 +35,8 @@ class Editor extends EventEmitter {
     this._bindContextMenu();
     this._initActionHooks();
     this._initServersPlugin();
+
+    this.Utils = Utils;
   }
 
   get fabricCanvas() {
@@ -94,6 +99,7 @@ class Editor extends EventEmitter {
       const hook = plugin[hookName];
       if (hook) {
         this.hooksEntity[hookName].tapPromise(plugin.pluginName + hookName, function () {
+          // console.log(hookName, ...arguments);
           // eslint-disable-next-line prefer-rest-params
           const result = hook.apply(plugin, [...arguments]);
           // hook 兼容非 Promise 返回值

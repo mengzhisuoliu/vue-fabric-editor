@@ -12,17 +12,12 @@ type IEditor = Editor;
 import { v4 as uuid } from 'uuid';
 import { getImgStr } from '../utils/utils';
 
-class CopyPlugin {
-  public canvas: fabric.Canvas;
-  public editor: IEditor;
+class CopyPlugin implements IPluginTempl {
   static pluginName = 'CopyPlugin';
   static apis = ['clone'];
-  public hotkeys: string[] = ['ctrl+v', 'ctrl+c'];
-  private cache: null | fabric.ActiveSelection | fabric.Object;
-  constructor(canvas: fabric.Canvas, editor: IEditor) {
-    this.canvas = canvas;
-    this.editor = editor;
-    this.cache = null;
+  hotkeys: string[] = ['ctrl+v', 'ctrl+c'];
+  private cache: null | fabric.ActiveSelection | fabric.Object = null;
+  constructor(public canvas: fabric.Canvas, public editor: IEditor) {
     this.initPaste();
   }
 
@@ -92,15 +87,20 @@ class CopyPlugin {
   }
 
   // 快捷键扩展回调
-  hotkeyEvent(eventName: string, e: any) {
+  hotkeyEvent(eventName: string, e: KeyboardEvent) {
     if (eventName === 'ctrl+c' && e.type === 'keydown') {
       const activeObject = this.canvas.getActiveObject();
       this.cache = activeObject;
+      // 清空剪切板
+      navigator.clipboard.writeText('');
     }
     if (eventName === 'ctrl+v' && e.type === 'keydown') {
-      if (this.cache) {
-        this.clone(this.cache);
-      }
+      // 确保clone元素操作的执行晚于pasteListener
+      setTimeout(() => {
+        if (this.cache) {
+          this.clone(this.cache);
+        }
+      }, 0);
     }
   }
 
@@ -213,11 +213,8 @@ class CopyPlugin {
         });
       }
     }
-    if (!items.length) {
-      if (this.cache) {
-        this.clone(this.cache);
-      }
-    }
+    // 复制浏览器外的元素时，清空暂存的画布内粘贴元素
+    if (items.length) this.cache = null;
   }
 }
 

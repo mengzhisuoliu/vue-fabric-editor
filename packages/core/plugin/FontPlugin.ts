@@ -2,7 +2,7 @@
  * @Author: 秦少卫
  * @Date: 2024-04-21 23:51:01
  * @LastEditors: 秦少卫
- * @LastEditTime: 2024-05-17 16:40:07
+ * @LastEditTime: 2024-06-07 21:53:36
  * @Description: 自定义字体
  */
 
@@ -27,17 +27,13 @@ interface FontSource {
   img: string;
 }
 
-class FontPlugin {
-  public canvas: fabric.Canvas;
-  public editor: IEditor;
+class FontPlugin implements IPluginTempl {
   private tempPromise: Promise<FontSource[]> | null;
   static pluginName = 'FontPlugin';
   static apis = ['getFontList', 'loadFont', 'getFontJson', 'downFontByJSON'];
   repoSrc: string;
   cacheList: FontSource[];
-  constructor(canvas: fabric.Canvas, editor: IEditor, config: { repoSrc: string }) {
-    this.canvas = canvas;
-    this.editor = editor;
+  constructor(public canvas: fabric.Canvas, public editor: IEditor, config: { repoSrc: string }) {
     this.repoSrc = config.repoSrc;
     this.cacheList = [];
     this.tempPromise = null;
@@ -76,9 +72,10 @@ class FontPlugin {
     const skipFonts = ['arial'];
     if (object.objects) {
       fontFamilies = JSON.parse(str)
-        .objects.filter(
-          (item: Font) => item.type.includes('text') && !skipFonts.includes(item.fontFamily)
-        )
+        .objects.filter((item: Font) => {
+          const hasFontFile = this.cacheList.find((font) => font.name === item.fontFamily);
+          return item.type.includes('text') && !skipFonts.includes(item.fontFamily) && hasFontFile;
+        })
         .map((item: Font) => item.fontFamily);
     } else {
       fontFamilies = skipFonts.includes(object.fontFamily) ? [] : [object.fontFamily];
@@ -99,7 +96,7 @@ class FontPlugin {
       const fileStr = `data:text/json;charset=utf-8,${encodeURIComponent(
         JSON.stringify(json, null, '\t')
       )}`;
-      const dataUrl = activeObject.toDataURL();
+      const dataUrl = activeObject.toDataURL({});
       downFile(fileStr, 'font.json');
       downFile(dataUrl, 'font.png');
     }

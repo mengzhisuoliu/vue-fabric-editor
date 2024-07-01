@@ -2,8 +2,8 @@
  * @Author: ShawnPhang
  * @Date: 2023-05-26 17:42:26
  * @Description: 调色板
- * @LastEditors: 秦少卫
- * @LastEditTime: 2024-05-21 11:48:56
+ * @LastEditors: June 1601745371@qq.com
+ * @LastEditTime: 2024-06-20 17:46:09
 -->
 <template>
   <div class="color-picker">
@@ -299,14 +299,18 @@ async function onMountedCallback() {
   function onChangeSL(position) {
     disableChangeHSLA();
 
-    const x = position.x * 100;
-    const y = position.y * 100;
+    try {
+      const x = position.x * 100;
+      const y = position.y * 100;
 
-    hsla.s = Math.round(x);
-    hsla.l = Math.round(100 - y);
+      hsla.s = Math.round(x);
+      hsla.l = Math.round(100 - y);
 
-    elPalettePointer.value.style.left = `${x}%`;
-    elPalettePointer.value.style.top = `${y}%`;
+      elPalettePointer.value.style.left = `${x}%`;
+      elPalettePointer.value.style.top = `${y}%`;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   sliderHuxMoveable = registerMoveableElement(elSliderHux.value, {
@@ -359,8 +363,8 @@ function recordValue(value) {
 }
 
 function updateValue(value) {
-  if (value === props.value) return;
-
+  // 纯色时value和props.value 一样导致不更新
+  // if (value === props.value) return;
   recordValue(value);
   emit('update:value', value);
 
@@ -432,16 +436,19 @@ function setColor(color) {
     hsla.a = _hsla[3];
 
     updateColorData(color);
+    try {
+      let x = hsla.s;
+      const y = Math.round(100 - hsla.l);
+      elPalettePointer.value.style.left = `${x}%`;
+      elPalettePointer.value.style.top = `${y}%`;
 
-    let x = hsla.s;
-    const y = Math.round(100 - hsla.l);
-    elPalettePointer.value.style.left = `${x}%`;
-    elPalettePointer.value.style.top = `${y}%`;
+      x = hsla.h / 360;
+      elSliderHuxPointer.value.style.left = `${x * 100}%`;
 
-    x = hsla.h / 360;
-    elSliderHuxPointer.value.style.left = `${x * 100}%`;
-
-    elSliderAlphaPointer.value.style.left = `${hsla.a * 100}%`;
+      elSliderAlphaPointer.value.style.left = `${hsla.a * 100}%`;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
@@ -469,20 +476,24 @@ function onChangeHex(value) {
     hsla.s = s;
     hsla.l = l;
 
-    elPalettePointer.value.style.left = `${hsla.s}%`;
-    elPalettePointer.value.style.top = `${100 - hsla.l}%`;
-    elSliderHuxPointer.value.style.left = `${(hsla.h / 360) * 100}%`;
+    try {
+      elPalettePointer.value.style.left = `${hsla.s}%`;
+      elPalettePointer.value.style.top = `${100 - hsla.l}%`;
+      elSliderHuxPointer.value.style.left = `${(hsla.h / 360) * 100}%`;
 
-    hex.value = value;
+      hex.value = value;
+    } catch (error) {
+      console.log(error);
+    }
   } else {
     // hex.value = backendHex
   }
 }
 
-function onChangeAlpha(value) {
-  hsla.a = value / 100;
-  elSliderAlphaPointer.value.style.left = `${value}%`;
-}
+// function onChangeAlpha(value) {
+// hsla.a = value / 100;
+//  elSliderAlphaPointer.value.style.left = `${value}%`;
+// }
 
 function disableChangeHSLA() {
   canChangeHSLAPointerPos = false;
@@ -538,6 +549,10 @@ function patchHexColor(str) {
 function angleChange() {
   updateValue(toGradientString(angle.value, gradients.value));
 }
+
+defineExpose({
+  updateValue,
+});
 </script>
 
 <style lang="less" scoped>

@@ -2,7 +2,7 @@
  * @Author: 秦少卫
  * @Date: 2022-09-05 22:21:55
  * @LastEditors: 秦少卫
- * @LastEditTime: 2024-04-22 00:43:01
+ * @LastEditTime: 2024-06-15 10:34:55
  * @Description: 工具文件
  */
 import { v4 as uuid } from 'uuid';
@@ -99,15 +99,6 @@ export function drawImg(
   ctx.restore();
 }
 
-export default {
-  getImgStr,
-  downFile,
-  selectFiles,
-  insertImgFile,
-  clipboardText,
-  drawImg,
-};
-
 export function shiftAngle(start: fabric.Point, end: fabric.Point) {
   const startX = start.x;
   const startY = start.y;
@@ -125,3 +116,62 @@ export function shiftAngle(start: fabric.Point, end: fabric.Point) {
     y: sinx + startY,
   };
 }
+
+/**
+ * 类型工具
+ */
+export const isImage = (thing: unknown): thing is fabric.Image => {
+  return thing instanceof fabric.Image;
+};
+
+export const isGroup = (thing: unknown): thing is fabric.Group => {
+  return thing instanceof fabric.Group;
+};
+
+export const isIText = (thing: unknown): thing is fabric.IText => {
+  return thing instanceof fabric.IText;
+};
+
+export const isActiveSelection = (thing: unknown): thing is fabric.ActiveSelection => {
+  return thing instanceof fabric.ActiveSelection;
+};
+
+export function blobToBase64(blob: Blob) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      resolve(reader.result);
+    });
+    reader.readAsDataURL(blob);
+  });
+}
+
+export function base64ToBlob(base64Data: string) {
+  if (!base64Data) {
+    return null;
+  }
+  const dataArr = base64Data.split(',');
+  const imageType = dataArr[0].match(/:(.*?);/)[1];
+  const textData = window.atob(dataArr[1]);
+  const arrayBuffer = new ArrayBuffer(textData.length);
+  const uint8Array = new Uint8Array(arrayBuffer);
+  for (let i = 0; i < textData.length; i++) {
+    uint8Array[i] = textData.charCodeAt(i);
+  }
+  return [new Blob([arrayBuffer], { type: imageType }), imageType.slice(6)];
+}
+
+export default {
+  getImgStr,
+  downFile,
+  selectFiles,
+  insertImgFile,
+  clipboardText,
+  drawImg,
+  isImage,
+  isGroup,
+  isIText,
+  isActiveSelection,
+  blobToBase64,
+  base64ToBlob,
+};

@@ -2,7 +2,7 @@
  * @Author: 秦少卫
  * @Date: 2024-06-06 16:27:21
  * @LastEditors: 秦少卫
- * @LastEditTime: 2024-06-07 11:58:56
+ * @LastEditTime: 2024-06-07 21:26:22
  * @Description: 条形码插件
 -->
 
@@ -25,7 +25,7 @@
         </div>
       </div>
 
-      <div class="flex-view">
+      <div class="flex-view" v-if="baseAttr.displayValue">
         <div class="flex-item">
           <span class="label">文字</span>
           <div class="content">
@@ -35,6 +35,24 @@
       </div>
 
       <div class="flex-view">
+        <div class="flex-item">
+          <span class="label">显示</span>
+          <div class="content">
+            <Switch v-model="baseAttr.displayValue" @on-change="changeCommon" />
+          </div>
+        </div>
+        <div class="flex-item" v-if="baseAttr.displayValue">
+          <span class="label">垂直</span>
+          <div class="content">
+            <Select v-model="baseAttr.textPosition" @on-change="changeCommon">
+              <Option value="bottom">bottom</Option>
+              <Option value="top">top</Option>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-view" v-if="baseAttr.displayValue">
         <div class="flex-item">
           <RadioGroup
             class="button-group"
@@ -56,7 +74,7 @@
             <ColorPicker v-model="baseAttr.lineColor" @on-change="changeCommon" alpha />
           </div>
         </div>
-        <div class="flex-item">
+        <div class="flex-item" v-if="baseAttr.displayValue">
           <div class="content">
             <InputNumber
               v-model="baseAttr.fontSize"
@@ -114,6 +132,7 @@ const baseAttr = reactive({
   fontSize: 12,
   background: '',
   lineColor: '',
+  displayValue: false,
 });
 
 // 字体对齐方式
@@ -144,6 +163,7 @@ const getObjectAttr = (e) => {
     baseAttr.fontSize = activeObject.get('extension').fontSize;
     baseAttr.background = activeObject.get('extension').background;
     baseAttr.lineColor = activeObject.get('extension').lineColor;
+    baseAttr.displayValue = activeObject.get('extension').displayValue;
   }
 };
 
@@ -245,6 +265,7 @@ onBeforeUnmount(() => {
   }
   .content {
     flex: 1;
+    align-content: center;
     // width: 60px;
   }
   .slider-box {

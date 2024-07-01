@@ -2,7 +2,7 @@
  * @Author: 秦少卫
  * @Date: 2022-09-03 19:16:55
  * @LastEditors: 秦少卫
- * @LastEditTime: 2024-05-17 15:24:00
+ * @LastEditTime: 2024-06-12 22:07:28
  * @Description: 导入模板
 -->
 
@@ -39,11 +39,11 @@
             <div class="tmpl-img-box">
               <Image
                 lazy
-                :src="info.src"
+                :src="info.previewSrc"
                 fit="contain"
                 height="100%"
                 :alt="info.name"
-                @click="beforeClearTip(info.json)"
+                @click="beforeClearTip(info)"
               />
             </div>
           </Tooltip>
@@ -60,9 +60,11 @@
 import useSelect from '@/hooks/select';
 import usePageList from '@/hooks/pageList';
 import { Spin, Modal } from 'view-ui-plus';
+
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
+const route = useRoute();
 const { t } = useI18n();
 const { canvasEditor } = useSelect();
 
@@ -79,6 +81,7 @@ const {
   nextPage,
   showScroll,
   scrollHeight,
+  getInfo,
 } = usePageList({
   typeUrl: 'templ-types',
   listUrl: 'templs',
@@ -86,30 +89,48 @@ const {
   searchWordKey: 'name',
   pageSize: 10,
   scrollElement: '#myTemplBox',
+  fields: ['name'],
 });
 
 // 替换提示
-const beforeClearTip = (json) => {
+const beforeClearTip = (info) => {
   Modal.confirm({
     title: t('tip'),
     content: `<p>${t('replaceTip')}</p>`,
     okText: t('ok'),
     cancelText: t('cancel'),
-    onOk: () => getTempData(json),
+    onOk: () => getTempData(info),
   });
 };
 
 onMounted(() => {
   startPage();
+  getTemplInfo();
 });
 
 // 获取模板数据
-const getTempData = (json) => {
+const getTempData = async (info) => {
   Spin.show({
     render: (h) => h('div', t('alert.loading_data')),
   });
-  router.replace('/');
-  canvasEditor.loadJSON(JSON.stringify(json), Spin.hide);
+  const infoRes = await getInfo(info.id);
+  if (route.query.admin) {
+    router.replace('/?tempId=' + info.id + '&admin=true');
+  } else {
+    router.replace('/?tempId=' + info.id);
+  }
+  canvasEditor.loadJSON(JSON.stringify(infoRes.data.data.attributes.json), Spin.hide);
+};
+
+const getTemplInfo = async () => {
+  if (route.query.tempId) {
+    try {
+      const infoRes = await getInfo(route.query.tempId);
+      canvasEditor.loadJSON(JSON.stringify(infoRes.data.data.attributes.json), Spin.hide);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 };
 </script>
 
@@ -139,7 +160,7 @@ const getTempData = (json) => {
   border-radius: 5px;
   overflow: hidden;
   &:hover {
-    /deep/.ivu-image-img {
+    :deep(.ivu-image-img) {
       opacity: 0.8;
     }
   }

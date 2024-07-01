@@ -11,7 +11,7 @@
 </div>
 
 - [预览](https://nihaojob.github.io/vue-fabric-editor/)
-- [Gitee 预览](https://nihaojob.gitee.io/vue-fabric-editor/#/)
+- [国内 预览](https://www.kuaitu.cc/editor/#/)
 
 ![image](https://user-images.githubusercontent.com/13534626/230828335-0adee0ae-b951-4171-b6ba-d2b9cd44dd6a.png)
 
@@ -152,7 +152,7 @@ pnpm dev
 
 ## 致谢
 
-- [color-gradient-picker-vue3](https://github.com/Qiu-Jun/color-gradient-picker-vue3) 一个 vue3 版本的渐变组件，作者[Qiu-Jun
+- [color-gradient-picker-vue3](https://github.com/Qiu-Jun/color-gradient-picker-vue3) 一个 vue3 版本的渐变组件，作者[Qiu-Jun(广佛求内推)
   ](https://github.com/Qiu-Jun)。
 - [刘明野](https://github.com/liumingye)标尺功能作者。
 - [palxiao](https://github.com/palxiao/poster-design/tree/main/packages/color-picker)设计编辑器的渐变组件。
@@ -217,17 +217,17 @@ pnpm dev
                 </a>
             </td>
             <td align="center">
-                <a href="https://github.com/ylx252">
-                    <img src="https://avatars.githubusercontent.com/u/6425957?v=4" width="80;" alt="ylx252"/>
-                    <br />
-                    <sub><b>ylx252</b></sub>
-                </a>
-            </td>
-            <td align="center">
                 <a href="https://github.com/AliceLanniste">
                     <img src="https://avatars.githubusercontent.com/u/17617116?v=4" width="80;" alt="AliceLanniste"/>
                     <br />
                     <sub><b>AliceLanniste</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/ylx252">
+                    <img src="https://avatars.githubusercontent.com/u/6425957?v=4" width="80;" alt="ylx252"/>
+                    <br />
+                    <sub><b>ylx252</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -240,6 +240,13 @@ pnpm dev
 		</tr>
 		<tr>
             <td align="center">
+                <a href="https://github.com/ByeWord">
+                    <img src="https://avatars.githubusercontent.com/u/37115721?v=4" width="80;" alt="ByeWord"/>
+                    <br />
+                    <sub><b>ByeWord</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/bigFace2019">
                     <img src="https://avatars.githubusercontent.com/u/55651401?v=4" width="80;" alt="bigFace2019"/>
                     <br />
@@ -251,13 +258,6 @@ pnpm dev
                     <img src="https://avatars.githubusercontent.com/u/86701050?v=4" width="80;" alt="wohuweixiya"/>
                     <br />
                     <sub><b>wohuweixiya</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/ByeWord">
-                    <img src="https://avatars.githubusercontent.com/u/37115721?v=4" width="80;" alt="ByeWord"/>
-                    <br />
-                    <sub><b>ByeWord</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -400,12 +400,21 @@ pnpm dev
                 </a>
             </td>
             <td align="center">
+                <a href="https://github.com/moJiXiang">
+                    <img src="https://avatars.githubusercontent.com/u/5847011?v=4" width="80;" alt="moJiXiang"/>
+                    <br />
+                    <sub><b>moJiXiang</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/macheteHot">
                     <img src="https://avatars.githubusercontent.com/u/26652329?v=4" width="80;" alt="macheteHot"/>
                     <br />
                     <sub><b>macheteHot</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/liuyaojun">
                     <img src="https://avatars.githubusercontent.com/u/25071631?v=4" width="80;" alt="liuyaojun"/>
@@ -413,8 +422,6 @@ pnpm dev
                     <sub><b>liuyaojun</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/jooyyy">
                     <img src="https://avatars.githubusercontent.com/u/30552622?v=4" width="80;" alt="jooyyy"/>
@@ -450,6 +457,8 @@ pnpm dev
                     <sub><b>Bamzc</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/Yangzongtai">
                     <img src="https://avatars.githubusercontent.com/u/93592008?v=4" width="80;" alt="Yangzongtai"/>
@@ -457,8 +466,6 @@ pnpm dev
                     <sub><b>Yangzongtai</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/Alicehhhmm">
                     <img src="https://avatars.githubusercontent.com/u/86783773?v=4" width="80;" alt="Alicehhhmm"/>
