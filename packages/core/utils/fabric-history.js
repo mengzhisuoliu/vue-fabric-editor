@@ -2,7 +2,7 @@
  * @Author: 秦少卫
  * @Date: 2024-07-09 13:46:14
  * @LastEditors: 秦少卫
- * @LastEditTime: 2024-07-09 14:27:27
+ * @LastEditTime: 2024-07-12 21:36:51
  * @Description: file content
  */
 /**
@@ -134,6 +134,9 @@ fabric.Canvas.prototype.redo = function (callback) {
 fabric.Canvas.prototype._loadHistory = function (history, event, callback) {
   var that = this;
 
+  history?.objects?.forEach((item) => {
+    if (item?.id === 'workspace') item.evented = false;
+  });
   this.loadFromJSON(history, function () {
     that.renderAll();
     that.fire(event);
@@ -146,10 +149,17 @@ fabric.Canvas.prototype._loadHistory = function (history, event, callback) {
 /**
  * Clear undo and redo history stacks
  */
-fabric.Canvas.prototype.clearHistory = function () {
-  this.historyUndo = [];
-  this.historyRedo = [];
-  this.fire('history:clear');
+fabric.Canvas.prototype.clearHistory = function (type) {
+  if (!type) {
+    this.historyUndo = [];
+    this.historyRedo = [];
+    this.fire('history:clear');
+  } else {
+    const one = this.historyUndo.pop();
+    this.historyUndo = [one];
+    this.historyRedo = [];
+    this.fire('history:clear');
+  }
 };
 
 fabric.Canvas.prototype.clearUndo = function () {
